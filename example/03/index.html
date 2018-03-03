@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Title Page</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.3/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+</head>
+
+<body>
+
+    <div class="container" id="app">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Пример динамискиох объетов</h1>
+                Каждая закаладка добавляется динамически через <i>addTab</i> в JS объекте
+                
+                <p>
+
+                <ul class="nav nav-tabs">
+                    <li role="presentation" data-ui-context="addTab" id="tabHome" class="active">
+                        <a href="#">Home</a>
+                    </li>
+                    <li role="presentation" data-ui-context="addTab" id="tabProfile">
+                        <a href="#">Profile</a>
+                    </li>
+                    <li role="presentation" data-ui-context="addTab" id="tabMessages">
+                        <a href="#">Messages</a>
+                    </li>
+                </ul>
+
+                <h2>
+                        На данный момент активна закладка "<spna data-ui="labelActiveTab"></spna>"                        
+                </h2>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Bootstrap JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- helperJQ -->
+    <script src="../../helper-jq.js"></script>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Title Page</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.3/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+</head>
+
+<body>
+    <div class="container" id="app">
+
+        <div class="row">
+            <h2 class="text-center" data-ui="title">Hello World</h2>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+
+                <div class="input-group">
+                    <input data-ui="newText" type="text" class="form-control" id="exampleInputAmount" placeholder="Enter text">
+                    <span class="input-group-btn">
+                        <button type="button" data-handler="setChengeText" class="btn btn-default">Go!</button>
+                    </span>
+                </div>
+
+                <br>
+
+                <div class="alert alert-warning" data-ui="alert.wrap" style="display:none">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <strong>Error!</strong> <span data-ui="alert.message"></span>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <h2 data-ui="fastTitle">Enter text</h2>
+                <input type="text" data-ui="newFastTitle" data-action="keyup" data-handler="setFastTitle" name="" id="input${1/(\w+)/\u\1/g}" class="form-control" value="Enter text" required="required" pattern="" title="">
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Bootstrap JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- helperJQ -->
+    <script src="../../helper-jq.js"></script>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
