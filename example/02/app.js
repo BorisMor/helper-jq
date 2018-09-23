@@ -19,7 +19,7 @@
         }
 
         this.init = function() {
-            window.helperJQ.standardConnection(self, self.ui.root, self.ui);
+            window.helperJQ.standardConnection(self, self.ui, self.ui.root);
         };
 
         self.init();

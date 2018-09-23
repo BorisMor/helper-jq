@@ -13,7 +13,7 @@
         this.ui = {
             root: $(DOM),
             labelActiveTab: undefined,
-            tabs: {} // Список закладок
+            tabs: {} // Список закладок. Создается динамически по addTab
         };
 
         /**
@@ -25,11 +25,7 @@
 
             for (var id in self.ui.tabs) {
                 var tab = self.ui.tabs[id];
-                if (id === idTab) {
-                    tab.addClass(CSS_TAB_ACTIVE);                
-                } else {
-                    tab.removeClass(CSS_TAB_ACTIVE)
-                }
+                window.helperJQ.toggleCssClass(tab, CSS_TAB_ACTIVE, id === idTab);            
             }
 
             self.onChangeTab();
@@ -46,6 +42,7 @@
 
         /**
          * Добавление закладки
+         * Вызывается через указание атрибута: data-ui-context="addTab"
          * @param {*} tab 
          */
         this.addTab = function(tab) {

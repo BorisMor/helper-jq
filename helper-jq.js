@@ -71,6 +71,9 @@
                 return;
             }
 
+            var contextName = self.getContextName(context);
+            var lenContextName = contextName.length + 1;
+
             var lstElem = $(rootDOM).find('[data-handler]');
             for (var i = 0, len = lstElem.length; i < len; i++) {
 
@@ -84,6 +87,11 @@
                         console.log('skip linkAction', 'for ' + el.data('context'), handler, action, el, context);
                     }
                     continue;
+                }
+
+                // пропускаем название объекта
+                if (handler.substr(0, lenContextName) === contextName + '.') {
+                    handler = handler.substr(lenContextName);
                 }
 
                 if (self.debug) {
@@ -170,17 +178,28 @@
                 return;
             }
 
+            var contextName = self.getContextName(context);
+            var lenContextName = contextName.length + 1;
+
             var lstElem = $(rootDOM).find('[data-ui]');
             for (var i = 0, len = lstElem.length; i < len; i++) {
                 var el = $(lstElem[i]);
                 var nameUI = el.data('ui');
+                var skipCheckContext = false;
 
-                if (!self.isWorkContext(el, context)) {
+                // пропускаем название объекта и не проверяем контекст
+                if (nameUI.substr(0, lenContextName) === contextName + '.') {
+                    nameUI = nameUI.substr(lenContextName);
+                    skipCheckContext = true;
+                }
+
+                if (!skipCheckContext && !self.isWorkContext(el, context)) {
                     if (self.debug) { console.log('skip data-ui', 'for ' + el.data('context'), nameUI, el, context)}
                     continue;
                 }
 
                 if (self.debug) { console.log('data-ui', nameUI, el, context); }
+
                 self.assign(container, nameUI, el, context)
             }
 
@@ -189,8 +208,15 @@
             for (var i = 0, len = lstElem.length; i < len; i++) {
                 var el = $(lstElem[i]);
                 var handler = el.data('ui-context');
+                var skipCheckContext = false;
 
-                if (!self.isWorkContext(el, context)) {
+                // пропускаем название объекта
+                if (handler.substr(0, lenContextName) === contextName + '.') {
+                    handler = handler.substr(lenContextName);
+                    skipCheckContext = true; // пропустить проверку контекста
+                }
+
+                if (!skipCheckContext && !self.isWorkContext(el, context)) {
                     if (self.debug) { console.log('skip ui-context', 'for ' + el.data('context'), handler, el, context)}
                     continue;
                 }
@@ -199,7 +225,7 @@
                 startFunctionInContext(handler, context, [el, container]);
             }
 
-            self.checkUI(container);
+            self.checkUI(container, context);
         };
 
         /**
@@ -215,16 +241,17 @@
          * Проверит контейнер UI элементов на заполненность
          * @param container
          */
-        this.checkUI = function (container) {
+        this.checkUI = function (container, infoContext) {
             for (var property in container) {
                 if (container.hasOwnProperty(property)) {
                     var val = container[property];
                     if (self.empty(val)) {
-                        console.error('property "' + property + '" is empty', container)
+                        console.error('property "' + property + '" is empty', container, infoContext)
                     }
                 }
             }
         };
+
 
         /**
          * Имя контекста в котром испольняется код
@@ -282,16 +309,50 @@
         };
 
         /**
-         * Изем объект в DOM дереве и назначаем на него компонент
+         * Ищем объект в DOM дереве и назначаем на него компонент
          * @param select
          * @param ClassComponent
+         * @param maybeEmpty
          */
-        this.initSingleComponent = function (select, ClassComponent) {
+        this.initSingleComponent = function (select, ClassComponent, maybeEmpty) {
             var nameComponent = self.getContextName(ClassComponent);
             select = typeof select == "undefined" ? '[data-controller="' + nameComponent +'"]': select;
             var lst = $(select);
             for(var i=0, len = lst.length; i < len; i++) {
                 self.singleComponent(lst[i], ClassComponent)
+            }
+
+            if (lst.length === 0 && !maybeEmpty) {
+                console.error('initSingleComponent: not found', select);
+            }
+
+            return result;
+        }
+
+        /**
+         * Удаляет на el класс css если верно уловие condition
+         * @param {*} el 
+         * @param string cssClass 
+         * @param boolean condition 
+         */
+        this.toggleCssClass = function(el, cssClass, condition) {
+            if (condition) {
+                $(el).addClass(cssClass);                
+            } else {
+                $(el).removeClass(cssClass)
+            }
+        }
+
+        /**
+         * Показывает элемент el если истина условие condition или прячет элемент
+         * @param {*} el 
+         * @param boolean condition 
+         */
+        this.toggleShow = function(el, condition) {
+            if (condition) {
+                $(el).show();                
+            } else {
+                $(el).hide();
             }
         }
     };
