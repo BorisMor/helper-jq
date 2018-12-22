@@ -327,7 +327,7 @@
             }
 
             return result;
-        }
+        };
 
         /**
          * Удаляет на el класс css если верно уловие condition
@@ -341,7 +341,7 @@
             } else {
                 $(el).removeClass(cssClass)
             }
-        }
+        };
 
         /**
          * Показывает элемент el если истина условие condition или прячет элемент
@@ -354,7 +354,84 @@
             } else {
                 $(el).hide();
             }
-        }
+        };
+
+
+        /**
+         * Проверяет менет ли данные клавиша
+         * @param keyCode
+         * @returns {boolean}
+         */
+        this.isKeyCodeChar = function(keyCode) {
+            return [16, 17, 18, 27, 37, 38, 39, 40].indexOf(keyCode) === -1
+        };
+
+        /**
+         * При изменение данных
+         * @param el
+         * @param funChange
+         */
+        this.onChangeData = function(el, funChange) {
+            if (el.is ('input') || el.is('textarea')) {
+                el.on('keyup', function (event) {
+                    if (self.isKeyCodeChar(event.keyCode)) {
+                        funChange(event)
+                    }
+                });
+            } else {
+                el.on('change', funChange);
+            }
+        };
+
+        /**
+         * Установить значение на элементе
+         * @param el
+         * @param value
+         */
+        this.setVal = function(el, value) {
+            if (el[0].value !== undefined) {
+                el.val(value);
+            } else {
+                el.html(value);
+            }
+        };
+
+        this.getVal = function (el) {
+            if (el[0].value !== undefined) {
+                return el.val();
+            } else {
+                return el.html();
+            }
+        };
+
+        this.linkDataUI = function (data, uiList, eventProcess) {
+
+            function getProcessChange(iEl, iKey) {
+                var key = iKey;
+                var el = iEl;
+                return function () {
+                    data[key] = self.getVal(el);
+                    if (typeof eventProcess === "function") {
+                        eventProcess.apply(self, [key]);
+                    }
+                };
+            }
+
+            for (var key in data) {
+
+                var el = uiList[key];
+                if (!el) {
+                    continue;
+                }
+
+                self.setVal(el, data[key]);
+
+                if (eventProcess) {
+                    self.onChangeData(el, getProcessChange(el, key))
+                }
+            }
+        };
+
     };
 
     window.helperJQ = new ClassHelperJQ();

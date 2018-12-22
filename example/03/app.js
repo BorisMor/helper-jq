@@ -65,7 +65,7 @@
         };
 
         this.init();
-    }
+    };
 
     var app = new Application('#app')
-})(window)
+})(window);

@@ -9,7 +9,7 @@
         this.ui = {
             root: $(DOM),
             label: undefined
-        }
+        };
 
         // Действо вызываемое из HTML
         this.onClick = function() {
@@ -21,10 +21,10 @@
         this.init = function() {
             window.helperJQ.standardConnection(self);
             self.countClick = 0;
-        }
+        };
 
         self.init();
     }
 
     var app = new Application('#app');
-})(window)
+})(window);

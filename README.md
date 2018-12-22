@@ -21,6 +21,22 @@ _rootDOM_ - Корневой DOM элемент к которому привяз
 _containerUI_ и _rootDOM_ необязательные параметры.<br />
 Если они не указываются то считается что _containerUI_ = _context.ui_, а _rootDOM_ = _context.ui.root_
 
+`helperJQ.linkDataUI(data, containerUI);`<br />
+Перенести данные в интерфейс. По одноименным полям в data и containerUI 
+_data_ - объект с данными
+_containerUI_ - объект в который складываются элементы указанные через data-ui
+_(см. пример example/04)_
+<br />
+
+`helperJQ.linkDataUI(data, containerUI, true);`<br />
+Переносит данные и обновляет каждый раз при изменение элементов интерфейса
+
+`helperJQ.linkDataUI(data, containerUI, function(key){
+    console.log(key)
+});`<br />
+Переносит данные, обновляет каждый раз при изменение элементов интерфейса, вызывает колбэк с указанием поля которое изменилось
+
+
 Простейший пример
 ----------
 При нажатие на кнопку увеличивает счетчик нажатий.
