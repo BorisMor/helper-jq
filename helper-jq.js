@@ -43,18 +43,26 @@
          * @param context
          * @returns {boolean}
          */
-        this.isWorkContext = function(el, context){
-            // Проверка имя контекста в котором
-            var workController = el.closest('[data-controller]');
-            if (!self.empty(workController)) {
-                var nameWorkController = workController.data('controller');
-                var currentController = self.getContextName(context);
+        this.isWorkContext = function (el, context) {
+            var nameWorkController = el.data('context');
 
-                el.data('context', nameWorkController);
-                return nameWorkController === currentController;
+            if (!nameWorkController) {
+                var workController = el.closest('[data-controller]');
+                if (!self.empty(workController)) {
+                    var nameWorkController = workController.data('controller');
+                    el.data('context', nameWorkController);
+                }
             }
 
-            return true;
+            var currentController = self.getContextName(context);
+
+            if (nameWorkController) {
+                return nameWorkController === currentController;
+            } else {
+                // без четко указанного контролера
+                el.data('context', currentController);
+                return true;
+            }
         };
 
         /**
@@ -117,15 +125,15 @@
 
             if (prop.length > 1) {
                 var e = prop.shift();
-                self.assign(obj[e] =
-                        Object.prototype.toString.call(obj[e]) === "[object Object]" ?
-                            obj[e] : {},
+                self.assign(
+                    obj[e] = self.isObject(obj[e]) ? obj[e] : {},
                     prop,
                     value,
                     context);
             } else {
                 var property = prop[0];
                 if (obj.hasOwnProperty(property)) {
+                    value.data('context-object', context);
                     obj[property] = value;
                 } else {
                     console.error('not propery "' + property + '"', obj, context);
@@ -194,12 +202,11 @@
                 }
 
                 if (!skipCheckContext && !self.isWorkContext(el, context)) {
-                    if (self.debug) { console.log('skip data-ui', 'for ' + el.data('context'), nameUI, el, context)}
+                    if (self.debug) { console.log('skip data-ui', 'for ' + el.data('context'), nameUI, el, context) }
                     continue;
                 }
 
                 if (self.debug) { console.log('data-ui', nameUI, el, context); }
-
                 self.assign(container, nameUI, el, context)
             }
 
@@ -217,7 +224,7 @@
                 }
 
                 if (!skipCheckContext && !self.isWorkContext(el, context)) {
-                    if (self.debug) { console.log('skip ui-context', 'for ' + el.data('context'), handler, el, context)}
+                    if (self.debug) { console.log('skip ui-context', 'for ' + el.data('context'), handler, el, context) }
                     continue;
                 }
 
@@ -316,9 +323,9 @@
          */
         this.initSingleComponent = function (select, ClassComponent, maybeEmpty) {
             var nameComponent = self.getContextName(ClassComponent);
-            select = typeof select == "undefined" ? '[data-controller="' + nameComponent +'"]': select;
+            select = typeof select == "undefined" ? '[data-controller="' + nameComponent + '"]' : select;
             var lst = $(select);
-            for(var i=0, len = lst.length; i < len; i++) {
+            for (var i = 0, len = lst.length; i < len; i++) {
                 self.singleComponent(lst[i], ClassComponent)
             }
 
@@ -335,9 +342,9 @@
          * @param string cssClass 
          * @param boolean condition 
          */
-        this.toggleCssClass = function(el, cssClass, condition) {
+        this.toggleCssClass = function (el, cssClass, condition) {
             if (condition) {
-                $(el).addClass(cssClass);                
+                $(el).addClass(cssClass);
             } else {
                 $(el).removeClass(cssClass)
             }
@@ -348,9 +355,9 @@
          * @param {*} el 
          * @param boolean condition 
          */
-        this.toggleShow = function(el, condition) {
+        this.toggleShow = function (el, condition) {
             if (condition) {
-                $(el).show();                
+                $(el).show();
             } else {
                 $(el).hide();
             }
@@ -362,7 +369,7 @@
          * @param keyCode
          * @returns {boolean}
          */
-        this.isKeyCodeChar = function(keyCode) {
+        this.isKeyCodeChar = function (keyCode) {
             return [16, 17, 18, 27, 37, 38, 39, 40].indexOf(keyCode) === -1
         };
 
@@ -371,38 +378,198 @@
          * @param el
          * @param funChange
          */
-        this.onChangeData = function(el, funChange) {
-            if (el.is ('input') || el.is('textarea')) {
-                el.on('keyup', function (event) {
-                    if (self.isKeyCodeChar(event.keyCode)) {
-                        funChange(event)
-                    }
-                });
-            } else {
+        this.onChangeData = function (el, funChange) {
+            if (el.is(':checkbox') || el.is(':radio')) {
                 el.on('change', funChange);
+            } else
+                if (el.is('input') || el.is('textarea')) {
+                    el.on('keyup', function (event) {
+                        if (self.isKeyCodeChar(event.keyCode)) {
+                            funChange(event)
+                        }
+                    });
+                } else {
+                    el.on('change', funChange);
+                }
+        };
+
+
+        /**
+ * Получить значение из radiobox
+ * @param el
+ * @returns {*}
+ */
+        this.getRadioValue = function (el) {
+            return el.find('input:checked').prop('value');
+        };
+
+        /**
+         * Установить значение для radiobox
+         * @param el
+         * @param val
+         */
+        this.setRadioValue = function (el, val) {
+            el.find('input[value="' + val + '"]').prop('checked', true);
+        };
+
+        /**
+         * Получить значение из чебокксов
+         * @param el
+         * @returns {Array}
+         */
+        this.getCheckboxValue = function (el) {
+            var result = [];
+            var items = el.find('input:checked');
+
+            for (var i = 0, len = items.length; i < len; i += 1) {
+                result.push($(items[i]).prop('value'));
+            }
+
+            return result;
+        };
+
+        this.setCheckboxValue = function (el, val) {
+            var items = val;
+
+            if (!helperJQ.isArray(val)) {
+                items = [val];
+            }
+
+            for (var i = 0, len = items.length; i < len; i += 1) {
+                el.find('input[value="' + items[i] + '"]').prop('checked', true);
             }
         };
+
+        /**
+         * Установить значение value на элементе el по источнику sourceData
+         */
+        function _setValBySource(el, value, sourceData) {
+            if (sourceData === 'radio') {
+                self.setRadioValue(el, value);
+            } else if (sourceData === 'checkbox') {
+                self.setCheckboxValue(el, value);
+            } else {
+                var setFunction = 'set' + sourceData;
+                var contextObject = el.data('context-object');
+
+                if (typeof contextObject[setFunction] !== "function") {
+                    console.error('not fount function ' + setFunction, contextObject)
+                } else {
+                    contextObject[setFunction].apply(contextObject, [el, value]);
+                }
+            }
+        }
+
+        /**
+         * Получить значение из элемента el по источнику sourceData 
+         */
+        function _getValBySource(el, sourceData) {
+            if (sourceData === 'radio') {
+                return self.getRadioValue(el);
+            } else if (sourceData === 'checkbox') {
+                return self.getCheckboxValue(el);
+            } else {
+                var getFunction = 'get' + sourceData;
+                var contextObject = el.data('context-object');
+
+                if (typeof contextObject[getFunction] !== "function") {
+                    console.error('not fount function ' + getFunction, contextObject)
+                } else {
+                    return contextObject[getFunction].apply(contextObject, [el]);
+                }
+            }
+        }
 
         /**
          * Установить значение на элементе
          * @param el
          * @param value
+         * @param elementHtml Обратится как к элементу html. Не обязательный параметр
          */
-        this.setVal = function(el, value) {
-            if (el[0].value !== undefined) {
+        this.setVal = function (el, value, elementHtml) {
+            if (!el || !el.length) {
+                return;
+            }
+
+            var sourceData = el.data('ui-source');
+
+            if (!elementHtml && sourceData) {
+                _setValBySource(el, value, sourceData);
+
+            } else if (el.is(':checkbox') || el.is(':radio')) {
+
+                if (typeof value === "boolean") {
+                    el.prop('checked', value);
+                } else {
+                    var test = el.val();
+                    el.prop('checked', value === test);
+                }
+
+            } else if (el[0].value !== undefined) {
                 el.val(value);
             } else {
                 el.html(value);
             }
         };
 
-        this.getVal = function (el) {
-            if (el[0].value !== undefined) {
+        /**
+         * Получить значение на элементе
+         * @param el
+         * @param elementHtml Обратится как к элементу html. Не обязательный параметр
+         */
+        this.getVal = function (el, elementHtml) {
+            if (!el || !el.length) {
+                return;
+            }
+
+            // Просто объект
+            if (self.isObject(el) && !self.isObjectJQuery(el)) {
+                ;
+                var result = {};
+                for (var key in el) {
+                    result[key] = self.getVal(el[key], elementHtml);
+                }
+                return result;
+            }
+
+            var sourceData = el.data('ui-source');
+
+            if (!elementHtml && sourceData) {
+                return _getValBySource(el, sourceData);
+            } else if (el[0].value !== undefined) {
                 return el.val();
             } else {
                 return el.html();
             }
         };
+
+        /**
+        * Это объект
+        * @param obj
+        * @returns {boolean}
+        */
+        this.isObject = function (obj) {
+            return obj && Object.prototype.toString.call(obj) === "[object Object]"
+        };
+
+        /**
+         * Это jquery элемент
+         * @param obj
+         * @returns {boolean}
+         */
+        this.isObjectJQuery = function (obj) {
+            return self.isObject(obj) && obj instanceof jQuery
+        };
+
+        /**
+         * Это массив
+         * @param obj
+         * @returns {boolean}
+         */
+        this.isArray = function (obj) {
+            return Object.prototype.toString.call(obj) === '[object Array]'
+        };
+
 
         this.linkDataUI = function (data, uiList, eventProcess) {
 
